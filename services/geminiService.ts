@@ -1,10 +1,27 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-// Initialize Gemini
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Initialize Gemini lazily to prevent crashes if API_KEY is missing on load
+const getAiClient = () => {
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) {
+    console.warn("API_KEY do Google Gemini não encontrada.");
+    return null;
+  }
+  return new GoogleGenAI({ apiKey });
+};
 
 export const generateLessonDetails = async (title: string, context: string): Promise<{ description: string; durationEstimate: string; tags: string[] }> => {
   try {
+    const ai = getAiClient();
+    
+    if (!ai) {
+      return {
+        description: "Configure a API Key para gerar descrições automáticas.",
+        durationEstimate: "00:00",
+        tags: ["Configurar API"]
+      };
+    }
+
     const prompt = `
       Create metadata for an online course lesson titled "${title}".
       Context of the course: ${context}.

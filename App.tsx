@@ -17,8 +17,8 @@ const App: React.FC = () => {
 
   const fetchCourses = async () => {
     try {
+      setLoading(true);
       // Fetch courses with nested modules and lessons
-      // Note: Supabase returns flat JSON structure, we need to ensure relationships are set up
       const { data: coursesData, error: coursesError } = await supabase
         .from('courses')
         .select(`
@@ -29,10 +29,12 @@ const App: React.FC = () => {
           )
         `);
 
-      if (coursesError) throw coursesError;
+      if (coursesError) {
+        console.error('Supabase fetch error:', coursesError);
+        // Do not throw, just allow empty state to render so user can see the app
+      }
 
       if (coursesData) {
-        // Sort modules and lessons by creation time or any other logic if needed
         const formattedCourses: Course[] = coursesData.map((c: any) => ({
            id: c.id,
            title: c.title,
@@ -61,7 +63,7 @@ const App: React.FC = () => {
         setCourses(formattedCourses);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Unexpected error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -266,12 +268,12 @@ const App: React.FC = () => {
         ) : (
            <div className="h-screen flex flex-col items-center justify-center text-center px-4">
               <h2 className="text-2xl font-bold mb-4">Bem-vindo ao METEFLIX</h2>
-              <p className="text-gray-400 mb-8">Nenhum curso encontrado no banco de dados.</p>
+              <p className="text-gray-400 mb-8">Nenhum curso encontrado ou banco de dados vazio.</p>
               <button 
                 onClick={() => setView(ViewState.ADMIN)}
                 className="bg-red-600 px-6 py-3 rounded font-bold hover:bg-red-700"
               >
-                Criar Primeiro Curso no Admin
+                ACESSAR PAINEL ADMIN
               </button>
            </div>
         )}
