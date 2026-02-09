@@ -1,0 +1,5 @@
+{
+  "name": "METEFLIX",
+  "description": "A Netflix-style online course platform where users can watch video lessons organized by modules, with an admin interface to add new content using AI assistance.",
+  "requestFramePermissions": []
+}
